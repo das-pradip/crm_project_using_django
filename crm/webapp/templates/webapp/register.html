@@ -13,9 +13,14 @@
         <form method="POST" autocomplete="off">
             {% csrf_token %}
             <!-- {{ form.as_p }} -->
-            {{ form|crispy }}
+            {{ form.username|as_crispy_field }}
             <br>
-            <button type="submit" class="btn btn-primary w-100 btn-block p-2"> Create account </button>
+            {{ form.password1|as_crispy_field }}
+            <br>
+            {{ form.password2|as_crispy_field }}
+            <!-- {{ form|crispy }} -->
+            <br>
+            <button type="submit" class="btn btn-primary w-100 btn-block p-2"> Create account &nbsp;<i class="fa-solid fa-user"></i> </button>
         </form>
         <br>
         <div class="text-center">

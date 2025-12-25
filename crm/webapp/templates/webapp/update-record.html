@@ -14,9 +14,19 @@
         <form method="POST" autocomplete="off">
             {% csrf_token %}
 
-            {{ form|crispy }}
+            {{ form.first_name|as_crispy_field }}
+            {{ form.last_name|as_crispy_field }}
+            {{ form.email|as_crispy_field }}
+            {{ form.phone|as_crispy_field }}
+            {{ form.address|as_crispy_field }}
+            {{ form.city|as_crispy_field }}
+            {{ form.state|as_crispy_field }}
+            {{ form.country|as_crispy_field }}
+            <!-- {{ form|crispy }} -->
             <br>
-            <button type="submit" class="btn btn-primary w-100 btn-block p-2"> Update record </button>
+            <button type="submit" class="btn btn-primary btn-sm"> Update record &nbsp;<i class="fa-solid fa-check"></i> </button>
+             &nbsp;
+             <a class="btn btn-primary btn-sm" href="{% url 'dashboard' %}"> Return &nbsp;<i class="fa-solid fa-arrow-left-long"></i></a>
         </form> 
         </div>
     </body> 
