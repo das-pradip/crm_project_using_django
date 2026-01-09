@@ -1,0 +1,28 @@
+{% extends 'webapp/base.html' %}
+
+{% block content %}
+    <a class="btn btn-outline-primary btn-sm" href="{% url 'create_lead' %}">
+
+          Create a new leads &nbsp; <i class="fa-solid fa-user-plus"></i>
+     </a>
+     <hr>
+
+    <table class="table table-bordered">
+    <tr>
+    <th>Name</th>
+    <th>Status</th>
+    <th>Assigned To</th>
+    <th> View </th>
+    </tr>
+
+    {% for lead in leads %}
+    <tr>
+    <td>{{ lead.first_name }} {{ lead.last_name }}</td>
+    <td>{{ lead.get_status_display }}</td>
+    <td>{{ lead.assigned_to }}</td>
+    <td> <a class="btn btn-success btn-sm" href="{% url 'lead' lead.id %}"><i class="fa-solid fa-eye"></i></a> </td>
+    </tr>
+    {% endfor %}
+    </table>
+   
+{% endblock %}

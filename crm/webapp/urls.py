@@ -14,4 +14,15 @@ urlpatterns = [
     path('update-record/<int:pk>', views.update_record, name="update-record"),
     path('record/<int:pk>', views.singular_record, name="record"),
     path('delete-record/<int:pk>', views.delete_record, name="delete-record"),
+
+
+
+
+
+
+    path('leads/', views.leads_list, name='leads'),
+    path('leads/create/', views.create_lead, name='create_lead'),
+    path('update-lead/<int:pk>', views.update_lead, name="update-lead"),
+    path('leads/<int:pk>', views.singular_lead, name="lead"),
+    path('delete-lead/<int:pk>', views.delete_lead, name="delete-lead"),
 ]

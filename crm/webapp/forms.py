@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from .models import Record
 
 from django import forms
+from .models import Lead
 
 from django.contrib.auth.forms import AuthenticationForm
 from django.forms.widgets import PasswordInput, TextInput
@@ -37,3 +38,36 @@ class UpdateRecordForm(forms.ModelForm):
     class Meta:
        model = Record
        fields = ['first_name', 'last_name', 'email', 'phone', 'address', 'city', 'state', 'country']
+
+
+# Lead form
+
+class LeadForm(forms.ModelForm):
+    class Meta:
+        model = Lead
+        fields = [
+            'first_name',
+            'last_name',
+            'email',
+            'phone',
+            'status',
+            'assigned_to'
+        ]
+
+
+
+
+# Update a lead
+
+class UpdateLeadForm(forms.ModelForm):
+     class Meta:
+        model = Lead
+        fields = [
+            'first_name',
+            'last_name',
+            'email',
+            'phone',
+            'status',
+            'assigned_to'
+        ]
+

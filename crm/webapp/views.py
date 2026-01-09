@@ -1,12 +1,12 @@
 from django.shortcuts import redirect, render
-from .forms import CreateUserForm, LoginForm, CreateRecordForm, UpdateRecordForm
+from .forms import CreateUserForm, LeadForm, LoginForm, CreateRecordForm, UpdateRecordForm, UpdateLeadForm
 
 from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate
 
 from django.contrib.auth.decorators import login_required
 
-from .models import Record
+from .models import Lead, Record
 
 from django.contrib import messages
 
@@ -155,3 +155,82 @@ def user_logout(request):
     auth.logout(request)
     messages.success(request, 'Logout success!')
     return redirect("my-login")
+
+
+@login_required
+def create_lead(request):
+    if request.method == "POST":
+        form = LeadForm(request.POST)
+        if form.is_valid():
+            lead = form.save(commit=False)
+            lead.created_by = request.user
+            lead.save()
+            return redirect('leads')
+    else:
+        form = LeadForm()
+
+    return render(request, 'webapp/create-lead.html', {'form': form})
+
+
+
+
+@login_required
+def leads_list(request):
+    if request.user:
+        leads = Lead.objects.all()
+    else:
+        leads = Lead.objects.filter(assigned_to=request.user)
+
+    return render(request, 'webapp/leads.html', {'leads': leads})
+
+
+
+
+
+
+@login_required(login_url='my-login')
+def update_lead(  request, pk):
+
+    lead = Lead.objects.get(id=pk)
+
+    form = UpdateLeadForm(instance=lead)
+
+    if request.method == 'POST':
+        form = UpdateLeadForm(request.POST, instance=lead)
+
+        if form.is_valid():
+            form.save()
+
+            messages.success(request, 'Your lead has been updated successfully!')
+
+
+            return redirect('lead', pk=pk)
+
+    context = {'form': form}
+
+    return render(request, 'webapp/update-lead.html', context=context)
+
+
+
+# Read / View a singular lead
+
+@login_required(login_url='my-login')
+def singular_lead(  request, pk):
+
+     lead = Lead.objects.get(id=pk)
+
+     context = {'lead': lead}
+
+     return render(request, 'webapp/view-lead.html', context=context)
+
+
+# Delete a lead
+@login_required(login_url='my-login')
+def delete_lead(  request, pk):
+
+    lead = Lead.objects.get(id=pk)
+    lead.delete()
+
+    messages.success(request, 'The lead has been deleted successfully!')
+
+    return redirect("leads")
