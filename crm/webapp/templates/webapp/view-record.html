@@ -3,14 +3,15 @@
 {% block content %}
 
    <div class="card">
-        <strong>
-            &nbsp;
-            {{ record.last_name|upper }} {{ record.first_name }}
-        </strong>
-
-        <hr>
 
         <div class="card-body">
+
+            <i class="fas fa-user"></i> &nbsp;
+            <strong>
+            {{ record.last_name|upper }} {{ record.first_name }}
+            </strong>
+
+            <hr>
             <p> <strong> ID: </strong>{{ record.id }} </p> 
             <p> <strong> Email: </strong>{{ record.email }} </p>
             <p> <strong> Phone: </strong>{{ record.phone }} </p>
