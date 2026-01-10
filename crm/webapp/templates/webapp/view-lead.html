@@ -25,7 +25,7 @@
          Return &nbsp;<i class="fa-solid fa-arrow-left-long"></i>
      </a>
         &nbsp;
-       <a class="btn btn-info btn-sm" href="{% url 'update-lead' lead.id %}">
+      <a class="btn btn-info btn-sm" href="{% url 'update-lead' lead.id %}">
 
           Update lead &nbsp;<i class="fa-solid fa-pen-to-square"></i>
      </a>
@@ -34,4 +34,26 @@
 
           Delete lead &nbsp;<i class="fa-solid fa-trash-can"></i>
      </a>
+
+     {% if lead.is_converted %}    
+              <button class="btn btn-success btn-sm w-10" disabled>
+               Lead already converted
+              <i class="fa-solid fa-check"></i>
+              </button>
+
+            {% elif lead.status == 'qualified' %}
+                <a href="{% url 'convert-lead' lead.id %}"
+                class="btn btn-success btn-sm w-100"
+                title="Convert to Customer">
+                Convert to Customer &nbsp;
+                 <i class="fa-solid fa-right-left"></i>
+                </a>
+      {% endif %}
+    <!-- {% if lead.status == 'qualified' %}
+       <a href="{% url 'convert-lead' lead.id %}"
+        class="btn btn-success btn-sm">
+        Convert to Customer &nbsp;
+       <i class="fa-solid fa-right-left"></i>
+      </a>
+    {% endif %} -->
 {% endblock %}

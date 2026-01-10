@@ -1,0 +1,69 @@
+{% extends 'webapp/base.html' %}
+
+{% block content %}
+
+<h4>Lead Pipeline</h4>
+<hr>
+
+<table class="table table-bordered table-hover align-middle text-center">
+    <thead class="table-light">
+        <tr>
+            <th>New</th>
+            <th>Contacted</th>
+            <th>Qualified</th>
+            <th>Converted</th>
+            <th>Lost</th>
+        </tr>
+    </thead>
+
+     <tbody>
+        {% for row in rows %}
+        <tr>
+
+            <td>
+                {% if row.new %}
+                    <strong>{{ row.new.first_name }} {{ row.new.last_name }}</strong><br>
+                    <small>{{ row.new.email }}</small>
+                {% endif %}
+            </td>
+
+            <td>
+                {% if row.contacted %}
+                    <strong>{{ row.contacted.first_name }} {{ row.contacted.last_name }}</strong><br>
+                    <small>{{ row.contacted.email }}</small>
+                {% endif %}
+            </td>
+
+            <td>
+                {% if row.qualified %}
+                    <strong>{{ row.qualified.first_name }} {{ row.qualified.last_name }}</strong><br>
+                    <small>{{ row.qualified.email }}</small>
+                {% endif %}
+            </td>
+
+            <td>
+                {% if row.converted %}
+                    <strong>
+                        {{ row.converted.first_name }} {{ row.converted.last_name }}
+                        <i class="fa-solid fa-check text-success"></i>
+                    </strong><br>
+                    <small>{{ row.converted.email }}</small>
+                {% endif %}
+            </td>
+
+            <td>
+                {% if row.lost %}
+                    <strong>{{ row.lost.first_name }} {{ row.lost.last_name }}</strong><br>
+                    <small>{{ row.lost.email }}</small>
+                {% endif %}
+            </td>
+
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5" class="text-muted">No leads available</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+
+{% endblock %}

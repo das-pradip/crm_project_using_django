@@ -18,7 +18,43 @@
             {{ form.last_name|as_crispy_field }}
             {{ form.email|as_crispy_field }}
             {{ form.phone|as_crispy_field }}
-            {{ form.status|as_crispy_field }}
+            <!-- {{ form.status|as_crispy_field }} -->
+
+
+
+             <p><strong>Status:</strong></p>
+
+            {% if lead.is_converted %}
+                <!-- LOCKED STATUS -->
+            <select class="form-select form-select-sm mb-2" disabled>
+            <option selected>Qualified</option>
+            </select>
+               <span class="badge bg-success">
+               Converted <i class="fa-solid fa-check"></i>
+               </span>
+               {% else %}
+                <!-- EDITABLE STATUS -->
+               <form method="POST" action="{% url 'update-lead' lead.id %}">
+               <!-- <form method="POST"> -->
+               {% csrf_token %}
+
+                <select name="status" class="form-select form-select-sm w-50 mb-2">
+                {% for key, value in status_choices %}
+                    <option value="{{ key }}" {% if lead.status == key %}selected{% endif %}>
+                        {{ value }}
+                    </option>
+                {% endfor %}
+                </select>
+
+                  <button type="submit" class="btn btn-outline-primary btn-sm">
+                Update Status
+                <i class="fa-solid fa-check"></i>
+                 </button>
+                </form>
+            {% endif %}
+
+
+
             {{ form.assigned_to|as_crispy_field }}
             <!-- {{ form|crispy }} -->
             <br>

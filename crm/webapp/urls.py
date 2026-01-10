@@ -25,4 +25,9 @@ urlpatterns = [
     path('update-lead/<int:pk>', views.update_lead, name="update-lead"),
     path('leads/<int:pk>', views.singular_lead, name="lead"),
     path('delete-lead/<int:pk>', views.delete_lead, name="delete-lead"),
+
+    path('convert-lead/<int:pk>/', views.convert_lead, name='convert-lead'),
+    path('leads/pipeline/', views.lead_pipeline, name='lead-pipeline'),
+    path('leads/analytics/', views.lead_status_analytics, name='lead-analytics'),
+
 ]

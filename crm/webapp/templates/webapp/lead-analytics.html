@@ -1,0 +1,66 @@
+{% extends 'webapp/base.html' %}
+
+{% block content %}
+
+
+
+<h4>Lead Status Analytics</h4>
+<hr>
+
+<div class="row g-3">
+
+    <!-- New -->
+    <div class="col-md-2">
+        <div class="card text-center border-primary">
+            <div class="card-body">
+                <span class="badge bg-primary">New</span>
+                <h3 class="mt-2">{{ analytics.new|default:0 }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contacted -->
+    <div class="col-md-2">
+        <div class="card text-center border-info">
+            <div class="card-body">
+                <span class="badge bg-info">Contacted</span>
+                <h3 class="mt-2">{{ analytics.contacted|default:0 }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Qualified -->
+    <div class="col-md-2">
+        <div class="card text-center border-warning">
+            <div class="card-body">
+                <span class="badge bg-success text-dark">Qualified</span>
+                <h3 class="mt-2">{{ analytics.qualified|default:0 }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Converted -->
+    <div class="col-md-2">
+        <div class="card text-center border-success">
+            <div class="card-body">
+                <span class="badge bg-dark">
+                    Converted <i class="fa-solid fa-check"></i>
+                </span>
+                <h3 class="mt-2">{{ analytics.converted|default:0 }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lost -->
+    <div class="col-md-2">
+        <div class="card text-center border-danger">
+            <div class="card-body">
+                <span class="badge bg-danger">Lost</span>
+                <h3 class="mt-2">{{ analytics.lost|default:0 }}</h3>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

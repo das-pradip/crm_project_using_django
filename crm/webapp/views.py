@@ -5,6 +5,7 @@ from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate
 
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 
 from .models import Lead, Record
 
@@ -174,14 +175,38 @@ def create_lead(request):
 
 
 
-@login_required
-def leads_list(request):
-    if request.user:
-        leads = Lead.objects.all()
-    else:
-        leads = Lead.objects.filter(assigned_to=request.user)
+# @login_required
+# def leads_list(request):
+#     if request.user:
+#         leads = Lead.objects.all()
+#     else:
+#         leads = Lead.objects.filter(assigned_to=request.user)
 
-    return render(request, 'webapp/leads.html', {'leads': leads})
+#     return render(request, 'webapp/leads.html', {'leads': leads})
+
+
+
+@login_required(login_url='my-login')
+def leads_list(request):
+
+    leads = Lead.objects.all()
+
+    if request.method == 'POST':
+        lead_id = request.POST.get('lead_id')
+        status = request.POST.get('status')
+
+        lead = Lead.objects.get(id=lead_id)
+        lead.status = status
+        lead.save()
+
+        messages.success(request, 'Lead status updated successfully!')
+        return redirect('leads')
+
+    context = {
+        'leads': leads,
+        'status_choices': Lead.STATUS_CHOICES
+    }
+    return render(request, 'webapp/leads.html', context)
 
 
 
@@ -206,7 +231,12 @@ def update_lead(  request, pk):
 
             return redirect('lead', pk=pk)
 
-    context = {'form': form}
+    context = {
+        'form': form,
+        'lead': lead,
+        'status_choices': Lead.STATUS_CHOICES
+
+    }
 
     return render(request, 'webapp/update-lead.html', context=context)
 
@@ -234,3 +264,98 @@ def delete_lead(  request, pk):
     messages.success(request, 'The lead has been deleted successfully!')
 
     return redirect("leads")
+
+
+@login_required(login_url='my-login')
+def convert_lead(request, pk):
+
+    lead = Lead.objects.get(id=pk)
+
+    # Safety check
+    if lead.status != 'qualified':
+        messages.error(request, 'Only qualified leads can be converted!')
+        return redirect('lead', pk=pk)
+    
+    if lead.is_converted:
+        messages.info(request, 'Lead already converted')
+        return redirect('lead')
+
+    
+    # DUPLICATE CUSTOMER CHECK 
+    if Record.objects.filter(email=lead.email).exists():
+
+        lead.is_converted = True
+        lead.save()
+
+        messages.error(request, 'Customer already exists!')
+        return redirect('lead', pk=pk)
+
+    # Create Record (Customer)
+    Record.objects.create(
+        first_name=lead.first_name,
+        last_name=lead.last_name,
+        email=lead.email,
+        phone=lead.phone,
+        address='N/A',
+        city='N/A',
+        state='N/A',
+        country='N/A',
+    )
+
+    # Update lead status
+    lead.status = 'converted'
+    lead.is_converted = True
+    lead.save()
+
+    messages.success(request, 'Lead converted to customer successfully!')
+    return redirect('leads')
+
+
+
+# Kanban pipeline view
+@login_required(login_url='my-login')
+def lead_pipeline(request):
+    new = list(Lead.objects.filter(status='new'))
+    contacted = list(Lead.objects.filter(status='contacted'))
+    qualified = list(Lead.objects.filter(status='qualified'))
+    converted = list(Lead.objects.filter(status='converted'))
+    lost = list(Lead.objects.filter(status='lost'))
+
+    max_len = max(
+        [len(new), len(contacted), len(qualified), len(converted), len(lost)],
+        default=0
+    )
+
+    rows = []
+    for i in range(max_len):
+        rows.append({
+            'new': new[i] if i < len(new) else None,
+            'contacted': contacted[i] if i < len(contacted) else None,
+            'qualified': qualified[i] if i < len(qualified) else None,
+            'converted': converted[i] if i < len(converted) else None,
+            'lost': lost[i] if i < len(lost) else None,
+        })
+
+    context = {
+        'rows': rows
+    }
+    return render(request, 'webapp/kanban-lead-view.html', context)
+
+
+@login_required(login_url='my-login')
+def lead_status_analytics(request):
+
+    status_counts = (
+        Lead.objects
+        .values('status')
+        .annotate(count=Count('id'))
+    )
+
+    # Convert queryset → dictionary
+    analytics = {item['status']: item['count'] for item in status_counts}
+
+    context = {
+        'analytics': analytics,
+    }
+
+    return render(request, 'webapp/lead-analytics.html', context)

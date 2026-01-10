@@ -1,28 +1,118 @@
-{% extends 'webapp/base.html' %}
+ {% extends 'webapp/base.html' %}
+
+{% load crispy_forms_tags %}
 
 {% block content %}
     <a class="btn btn-outline-primary btn-sm" href="{% url 'create_lead' %}">
 
           Create a new leads &nbsp; <i class="fa-solid fa-user-plus"></i>
      </a>
+
+      <a class="btn btn-outline-primary btn-sm" href="{% url 'lead-pipeline' %}">
+
+          Leads list&nbsp; <i class="fa-solid fa-filter text-success"></i>
+     </a>
+
+      <a class="btn btn-outline-primary btn-sm" href="{% url 'lead-analytics' %}">
+
+          Leads Analytics&nbsp; <i class="fa-solid fa-chart-line text-success"></i>
+     </a>
      <hr>
 
-    <table class="table table-bordered">
+    <table class="table table-bordered table-hover align-middle text-center">
     <tr>
     <th>Name</th>
     <th>Status</th>
     <th>Assigned To</th>
+    <th> Update Status</th>
     <th> View </th>
     </tr>
 
     {% for lead in leads %}
     <tr>
-    <td>{{ lead.first_name }} {{ lead.last_name }}</td>
-    <td>{{ lead.get_status_display }}</td>
-    <td>{{ lead.assigned_to }}</td>
+    <td>{{ lead.first_name }} {{ lead.last_name }}</td> 
+
+    <!-- <td>{{ lead.get_status_display }}</td> -->
+
+    <td style="min-width: 220px;">
+    <!-- Status Badge -->
+    <span class="badge 
+        {% if lead.status == 'new' %} bg-secondary
+        {% elif lead.status == 'contacted' %} bg-info
+        {% elif lead.status == 'qualified' %} bg-success
+        {% elif lead.status == 'converted' %} bg-info
+        {% elif lead.status == 'lost' %} bg-danger
+        {% endif %}
+        mb-1 d-inline-block">
+        {{ lead.get_status_display }}
+    </span>
+    </td>
+
+    <td>{{ lead.assigned_to }}</td> 
+
+    <!-- UPDATE STATUS -->
+    <td style="width: 220px;">
+
+
+    {% if lead.is_converted %}
+
+        <!-- CONVERTED STATE -->
+           <select class="form-select form-select-sm mb-2" disabled>
+            <option selected>Qualified</option>
+            </select>
+
+            <button class="btn btn-success btn-sm w-100" disabled>
+            Converted
+            <i class="fa-solid fa-check"></i>
+            </button>
+        
+        {% else %}
+
+        <form method="POST" class="d-flex align-items-center gap-1">
+        <!-- <form method="POST">     -->
+            {% csrf_token %}
+            <input type="hidden" name="lead_id" value="{{ lead.id }}">
+
+            <select name="status" class="form-select form-select-sm w-100">
+            <!-- <select name="status" class="form-select form-select-sm mb-2"></select>  -->
+                {% for key, value in status_choices %}
+                    <option value="{{ key }}" {% if lead.status == key %}selected{% endif %}>
+                        {{ value }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="btn btn-primary btn-sm mt-1 px-2">
+                Update
+                 <i class="fa-solid fa-check"></i>
+            </button>
+
+            {% if lead.is_converted %}
+
+              <button class="btn btn-success btn-sm w-100" disabled>
+               Lead already converted
+              <i class="fa-solid fa-check"></i>
+              </button>
+
+            {% elif lead.status == 'qualified' %}
+                <a href="{% url 'convert-lead' lead.id %}"
+                class="btn btn-success btn-sm w-100"
+                title="Convert to Customer">
+                Convert to Customer &nbsp;
+                 <i class="fa-solid fa-right-left"></i>
+                </a>
+            {% endif %}
+    {% endif %}
+        </form>
+    </td>
+
     <td> <a class="btn btn-success btn-sm" href="{% url 'lead' lead.id %}"><i class="fa-solid fa-eye"></i></a> </td>
     </tr>
     {% endfor %}
     </table>
    
-{% endblock %}
+{% endblock %}  
+
+
+
+  
