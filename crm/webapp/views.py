@@ -439,6 +439,40 @@ def lead_status_analytics(request):
 
 
 
+# @login_required(login_url='my-login')
+# @admin_required
+# def manage_user_roles(request):
+
+#     users = User.objects.select_related('profile')
+
+#     if request.method == 'POST':
+#         user_id = request.POST.get('user_id')
+#         role = request.POST.get('role')
+
+#         if str(request.user.id) == user_id:
+#             messages.error(request, "You cannot change your own role.")
+#             return redirect('manage-roles')
+
+#         user = User.objects.get(id=user_id)
+#         user.profile.role = role
+#         user.profile.save()
+
+#         messages.success(request, f"Role updated for {user.username}")
+#         return redirect('manage-roles')
+
+#     context = {
+#         'users': users,
+#         'roles': ['admin', 'manager', 'sales']
+#     }
+
+#     return render(request, 'webapp/manage-roles.html', context)
+
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .decorators import admin_required
+
 @login_required(login_url='my-login')
 @admin_required
 def manage_user_roles(request):
@@ -446,18 +480,49 @@ def manage_user_roles(request):
     users = User.objects.select_related('profile')
 
     if request.method == 'POST':
+        action = request.POST.get('action')
         user_id = request.POST.get('user_id')
-        role = request.POST.get('role')
-
-        if str(request.user.id) == user_id:
-            messages.error(request, "You cannot change your own role.")
-            return redirect('manage-roles')
 
         user = User.objects.get(id=user_id)
-        user.profile.role = role
-        user.profile.save()
 
-        messages.success(request, f"Role updated for {user.username}")
+        #  PREVENT SELF ACTION
+        if user == request.user:
+            messages.error(request, "You cannot modify or delete yourself")
+            return redirect('manage-roles')
+
+        #  UPDATE ROLE
+        if action == 'update':
+            role = request.POST.get('role')
+
+            # Prevent removing last admin
+            if user.profile.role == 'admin' and role != 'admin':
+                admin_count = User.objects.filter(profile__role='admin').count()
+                if admin_count <= 1:
+                    messages.error(request, "At least one admin is required")
+                    return redirect('manage-roles')
+
+            user.profile.role = role
+            user.profile.save()
+            messages.success(request, f"Role updated for {user.username}")
+
+        #  DELETE USER
+        elif action == 'delete':
+
+            # Prevent deleting superuser
+            if user.is_superuser:
+                messages.error(request, "Superuser cannot be deleted")
+                return redirect('manage-roles')
+
+            # Prevent deleting last admin
+            if user.profile.role == 'admin':
+                admin_count = User.objects.filter(profile__role='admin').count()
+                if admin_count <= 1:
+                    messages.error(request, "Cannot delete the last admin")
+                    return redirect('manage-roles')
+
+            user.delete()
+            messages.success(request, "User deleted successfully")
+
         return redirect('manage-roles')
 
     context = {
