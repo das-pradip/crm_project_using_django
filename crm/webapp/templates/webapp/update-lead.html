@@ -19,6 +19,7 @@
             {{ form.email|as_crispy_field }}
             {{ form.phone|as_crispy_field }}
             <!-- {{ form.status|as_crispy_field }} -->
+            {{ form.assigned_to|as_crispy_field }}
 
 
 
@@ -30,7 +31,7 @@
             <option selected>Qualified</option>
             </select>
                <span class="badge bg-success">
-               Converted <i class="fa-solid fa-check"></i>
+               Qualified <i class="fa-solid fa-check"></i>
                </span>
                {% else %}
                 <!-- EDITABLE STATUS -->
@@ -50,17 +51,17 @@
                 Update Status
                 <i class="fa-solid fa-check"></i>
                  </button>
+                 <button type="submit" class="btn btn-primary btn-sm"> Update lead &nbsp;<i class="fa-solid fa-check"></i> </button>
+                 <a class="btn btn-primary btn-sm" href="{% url 'leads' %}"> Return &nbsp;<i class="fa-solid fa-arrow-left-long"></i></a>
                 </form>
             {% endif %}
 
 
 
-            {{ form.assigned_to|as_crispy_field }}
+            <!-- {{ form.assigned_to|as_crispy_field }} -->
             <!-- {{ form|crispy }} -->
             <br>
-            <button type="submit" class="btn btn-primary btn-sm"> Update lead &nbsp;<i class="fa-solid fa-check"></i> </button>
-             &nbsp;
-             <a class="btn btn-primary btn-sm" href="{% url 'leads' %}"> Return &nbsp;<i class="fa-solid fa-arrow-left-long"></i></a>
+            <!-- <button type="submit" class="btn btn-primary btn-sm"> Update lead &nbsp;<i class="fa-solid fa-check"></i> </button> -->
         </form> 
         </div>
     </body> 

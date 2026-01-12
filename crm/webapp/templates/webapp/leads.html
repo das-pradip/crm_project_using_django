@@ -12,11 +12,14 @@
 
           Leads list&nbsp; <i class="fa-solid fa-filter text-success"></i>
      </a>
-
-      <a class="btn btn-outline-primary btn-sm" href="{% url 'lead-analytics' %}">
-
+     
+     {% if request.user.profile.role in 'admin manager' %}
+        <a class="btn btn-outline-primary btn-sm" href="{% url 'lead-analytics' %}">
           Leads Analytics&nbsp; <i class="fa-solid fa-chart-line text-success"></i>
-     </a>
+        </a>
+     {% endif %}
+
+     
      <hr>
 
     <table class="table table-bordered table-hover align-middle text-center">
@@ -51,7 +54,7 @@
     <td>{{ lead.assigned_to }}</td> 
 
     <!-- UPDATE STATUS -->
-    <td style="width: 220px;">
+    <td style="width: 260px;">
 
 
     {% if lead.is_converted %}
@@ -62,14 +65,14 @@
             </select>
 
             <button class="btn btn-success btn-sm w-100" disabled>
-            Converted
+            Qualified
             <i class="fa-solid fa-check"></i>
             </button>
         
         {% else %}
 
-        <form method="POST" class="d-flex align-items-center gap-1">
-        <!-- <form method="POST">     -->
+
+        <form method="POST" class="align-items-center gap-3">
             {% csrf_token %}
             <input type="hidden" name="lead_id" value="{{ lead.id }}">
 
@@ -82,7 +85,7 @@
                 {% endfor %}
             </select>
 
-            <button type="submit" class="btn btn-primary btn-sm mt-1 px-2">
+            <button type="submit" class="btn btn-primary btn-sm mt-2 px-2 w-100">
                 Update
                  <i class="fa-solid fa-check"></i>
             </button>
@@ -94,14 +97,17 @@
               <i class="fa-solid fa-check"></i>
               </button>
 
-            {% elif lead.status == 'qualified' %}
-                <a href="{% url 'convert-lead' lead.id %}"
-                class="btn btn-success btn-sm w-100"
-                title="Convert to Customer">
-                Convert to Customer &nbsp;
-                 <i class="fa-solid fa-right-left"></i>
-                </a>
+            
+
+             {% elif request.user.profile.role in 'admin manager' and lead.status == 'qualified' %}
+              <a href="{% url 'convert-lead' lead.id %}"  class="btn btn-success btn-sm">
+              Convert to Customer
+              
+              <i class="fa-solid fa-right-left"></i>
+              </a>
             {% endif %}
+
+
     {% endif %}
         </form>
     </td>

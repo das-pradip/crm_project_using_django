@@ -1,7 +1,7 @@
 
 from . import views
 
-from django.urls import path
+from django.urls import path,include
 
 urlpatterns = [
     path('', views.home, name=""),
@@ -29,5 +29,7 @@ urlpatterns = [
     path('convert-lead/<int:pk>/', views.convert_lead, name='convert-lead'),
     path('leads/pipeline/', views.lead_pipeline, name='lead-pipeline'),
     path('leads/analytics/', views.lead_status_analytics, name='lead-analytics'),
+
+    path('manage-roles/', views.manage_user_roles, name='manage-roles')
 
 ]

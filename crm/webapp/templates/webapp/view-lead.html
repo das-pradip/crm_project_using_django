@@ -20,20 +20,22 @@
 
    <br>
 
-    <a class="btn btn-secondary btn-sm" href="{% url 'leads' %}">
+      <a class="btn btn-secondary btn-sm" href="{% url 'leads' %}">
             
          Return &nbsp;<i class="fa-solid fa-arrow-left-long"></i>
-     </a>
+      </a>
         &nbsp;
+      {% if not lead.is_converted %}
       <a class="btn btn-info btn-sm" href="{% url 'update-lead' lead.id %}">
 
           Update lead &nbsp;<i class="fa-solid fa-pen-to-square"></i>
-     </a>
+      </a>
+      {% endif %}
         &nbsp;
-     <a class="btn btn-outline-primary btn-danger btn-sm" href="{% url 'delete-lead' lead.id %}">
+      <a class="btn btn-outline-primary btn-danger btn-sm" href="{% url 'delete-lead' lead.id %}">
 
           Delete lead &nbsp;<i class="fa-solid fa-trash-can"></i>
-     </a>
+      </a>
 
      {% if lead.is_converted %}    
               <button class="btn btn-success btn-sm w-10" disabled>
@@ -43,7 +45,7 @@
 
             {% elif lead.status == 'qualified' %}
                 <a href="{% url 'convert-lead' lead.id %}"
-                class="btn btn-success btn-sm w-100"
+                class="btn btn-success btn-sm w-10"
                 title="Convert to Customer">
                 Convert to Customer &nbsp;
                  <i class="fa-solid fa-right-left"></i>

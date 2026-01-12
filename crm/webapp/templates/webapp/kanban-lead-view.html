@@ -2,9 +2,12 @@
 
 {% block content %}
 
-<h4>Lead Pipeline</h4>
+<h4 >Lead Pipeline</h4>
+<a class="btn btn-secondary btn-sm" href="{% url 'leads' %}">
+            
+         Return &nbsp;<i class="fa-solid fa-arrow-left-long"></i>
+</a>
 <hr>
-
 <table class="table table-bordered table-hover align-middle text-center">
     <thead class="table-light">
         <tr>
@@ -36,7 +39,9 @@
 
             <td>
                 {% if row.qualified %}
-                    <strong>{{ row.qualified.first_name }} {{ row.qualified.last_name }}</strong><br>
+                    <strong>{{ row.qualified.first_name }} {{ row.qualified.last_name }}
+                        <i class="fa-solid fa-check text-success"></i>
+                    </strong><br>
                     <small>{{ row.qualified.email }}</small>
                 {% endif %}
             </td>
@@ -45,7 +50,7 @@
                 {% if row.converted %}
                     <strong>
                         {{ row.converted.first_name }} {{ row.converted.last_name }}
-                        <i class="fa-solid fa-check text-success"></i>
+                        
                     </strong><br>
                     <small>{{ row.converted.email }}</small>
                 {% endif %}

@@ -1,15 +1,20 @@
 from django.shortcuts import redirect, render
 from .forms import CreateUserForm, LeadForm, LoginForm, CreateRecordForm, UpdateRecordForm, UpdateLeadForm
 
+
+from .decorators import admin_required
 from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
 
 from django.contrib.auth.decorators import login_required
+from .decorators import role_required
 from django.db.models import Count
 
 from .models import Lead, Record
 
 from django.contrib import messages
+
 
 
 # Home page
@@ -186,20 +191,67 @@ def create_lead(request):
 
 
 
+# @login_required(login_url='my-login')
+# def leads_list(request):
+
+#     leads = Lead.objects.all()
+
+#     if request.method == 'POST':
+#         lead_id = request.POST.get('lead_id')
+#         status = request.POST.get('status')
+
+#         lead = Lead.objects.get(id=lead_id)
+#         lead.status = status
+#         lead.save()
+
+#         messages.success(request, 'Lead status updated successfully!')
+#         return redirect('leads')
+
+#     context = {
+#         'leads': leads,
+#         'status_choices': Lead.STATUS_CHOICES
+#     }
+#     return render(request, 'webapp/leads.html', context)
+
+
+
 @login_required(login_url='my-login')
 def leads_list(request):
 
-    leads = Lead.objects.all()
+    user_role = request.user.profile.role
 
+    # VIEW PERMISSION
+    if user_role == 'sales':
+        leads = Lead.objects.filter(assigned_to=request.user)
+    else:
+        leads = Lead.objects.all()
+
+    # UPDATE PERMISSION
     if request.method == 'POST':
+
+        if user_role not in ['admin', 'manager', 'sales']:
+            messages.error(request, "You are not allowed to update lead status")
+            return redirect('leads')
+
         lead_id = request.POST.get('lead_id')
         status = request.POST.get('status')
 
         lead = Lead.objects.get(id=lead_id)
+
+        # Optional: Sales can update ONLY their assigned leads
+        if user_role == 'sales' and lead.assigned_to != request.user:
+            messages.error(request, "You cannot update this lead")
+            return redirect('leads')
+
+        # Prevent update after conversion
+        if lead.is_converted:
+            messages.warning(request, "Converted leads cannot be updated")
+            return redirect('leads')
+
         lead.status = status
         lead.save()
 
-        messages.success(request, 'Lead status updated successfully!')
+        messages.success(request, "Lead status updated successfully")
         return redirect('leads')
 
     context = {
@@ -207,10 +259,6 @@ def leads_list(request):
         'status_choices': Lead.STATUS_CHOICES
     }
     return render(request, 'webapp/leads.html', context)
-
-
-
-
 
 
 @login_required(login_url='my-login')
@@ -303,7 +351,8 @@ def convert_lead(request, pk):
     )
 
     # Update lead status
-    lead.status = 'converted'
+    # lead.status = 'converted'
+    lead.status = 'qualified'
     lead.is_converted = True
     lead.save()
 
@@ -343,7 +392,20 @@ def lead_pipeline(request):
 
 
 @login_required(login_url='my-login')
+@role_required(['admin', 'manager'])
 def lead_status_analytics(request):
+
+
+    user_role = request.user.profile.role
+    
+
+    total_leads = Lead.objects.count()
+    converted_leads = Lead.objects.filter(is_converted=True).count()
+    
+    conversion_rate = (
+       round((converted_leads / total_leads) * 100, 2)
+        if total_leads > 0 else 0
+    )
 
     status_counts = (
         Lead.objects
@@ -351,11 +413,56 @@ def lead_status_analytics(request):
         .annotate(count=Count('id'))
     )
 
-    # Convert queryset → dictionary
-    analytics = {item['status']: item['count'] for item in status_counts}
+    STATUS_LABELS = dict(Lead.STATUS_CHOICES)
+
+    labels = []
+    data = []
+
+
+    analytics = {item['status']: item['count'] for item in    status_counts}
+    
+
+    for item in status_counts:
+        labels.append(STATUS_LABELS.get(item['status']))
+        data.append(item['count'])
 
     context = {
+        'labels': labels,
+        'data': data,
+
         'analytics': analytics,
+        'conversion_rate': conversion_rate
     }
 
     return render(request, 'webapp/lead-analytics.html', context)
+
+
+
+
+@login_required(login_url='my-login')
+@admin_required
+def manage_user_roles(request):
+
+    users = User.objects.select_related('profile')
+
+    if request.method == 'POST':
+        user_id = request.POST.get('user_id')
+        role = request.POST.get('role')
+
+        if str(request.user.id) == user_id:
+            messages.error(request, "You cannot change your own role.")
+            return redirect('manage-roles')
+
+        user = User.objects.get(id=user_id)
+        user.profile.role = role
+        user.profile.save()
+
+        messages.success(request, f"Role updated for {user.username}")
+        return redirect('manage-roles')
+
+    context = {
+        'users': users,
+        'roles': ['admin', 'manager', 'sales']
+    }
+
+    return render(request, 'webapp/manage-roles.html', context)

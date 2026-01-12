@@ -1,10 +1,14 @@
 {% extends 'webapp/base.html' %}
+{% load static %}
 
 {% block content %}
 
 
-
 <h4>Lead Status Analytics</h4>
+<a class="btn btn-secondary btn-sm" href="{% url 'leads' %}">
+            
+         Return &nbsp;<i class="fa-solid fa-arrow-left-long"></i>
+      </a>
 <hr>
 
 <div class="row g-3">
@@ -33,7 +37,7 @@
     <div class="col-md-2">
         <div class="card text-center border-warning">
             <div class="card-body">
-                <span class="badge bg-success text-dark">Qualified</span>
+                <span class="badge bg-warning text-dark">Qualified</span>
                 <h3 class="mt-2">{{ analytics.qualified|default:0 }}</h3>
             </div>
         </div>
@@ -43,7 +47,7 @@
     <div class="col-md-2">
         <div class="card text-center border-success">
             <div class="card-body">
-                <span class="badge bg-dark">
+                <span class="badge bg-success">
                     Converted <i class="fa-solid fa-check"></i>
                 </span>
                 <h3 class="mt-2">{{ analytics.converted|default:0 }}</h3>
@@ -63,4 +67,57 @@
 
 </div>
 
+
+
+
+<br>
+{{ labels|json_script:"lead-labels" }}
+{{ data|json_script:"lead-data" }}
+
+<div class="row">
+  <div class="col-md-4">
+    <div class="card shadow-sm p-3">
+      <canvas id="statusChart"></canvas>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card shadow-sm p-3">
+      <canvas id="barChart"></canvas>
+    </div>
+  </div>
+</div>
+<br>
+
+<!-- Conversion rate  -->
+<div class="col-md-3">
+    <div class="card text-center border-success">
+        <div class="card-body">
+            <span class="badge bg-success">Conversion Rate</span>
+
+            {% if conversion_rate >= 40 %}
+              <span class="text-success">Excellent</span>
+            {% elif conversion_rate >= 20 %}
+               <span class="text-warning">Average</span>
+            {% else %}
+               <span class="text-danger">Needs Improvement</span>  
+            {% endif %} 
+
+            <h3 class="mt-2">{{ conversion_rate }}%</h3>
+            <small>{{ converted_leads }} / {{ total_leads }} leads</small>
+
+
+        </div>
+    </div>
+</div>
+<br>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="{% static 'js/lead-analytics.js' %}"></script>
+
 {% endblock %}
+
+
