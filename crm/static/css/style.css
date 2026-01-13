@@ -1,6 +1,11 @@
 /* h1{
     color: red;
 } */
+  body {
+        background: linear-gradient(135deg, #e3f2fd, #f8f9fa);
+        min-height: 100vh;
+    }
+
 
 .form-layout{
     border-radius: 15px;
@@ -9,4 +14,12 @@
 
 .message-text{
     color: white;
+}
+
+.navbar .nav-link {
+    text-decoration: none;
+}
+
+.navbar .nav-link:hover {
+    color: #f8f9fa;
 }

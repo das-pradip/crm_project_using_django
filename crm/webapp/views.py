@@ -396,7 +396,7 @@ def lead_pipeline(request):
 def lead_status_analytics(request):
 
 
-    user_role = request.user.profile.role
+    # user_role = request.user.profile.role
     
 
     total_leads = Lead.objects.count()
@@ -531,3 +531,28 @@ def manage_user_roles(request):
     }
 
     return render(request, 'webapp/manage-roles.html', context)
+
+
+# Show user profile
+
+@login_required
+def profile_view(request):
+    profile = request.user.profile
+
+    # if request.method == 'POST':
+    #     profile.profile_image = request.FILES.get('profile_image')
+    #     profile.save()
+    #     messages.success(request, "Profile updated successfully")
+    #     return redirect('profile')
+
+    if request.method == "POST":
+        if request.FILES.get('profile_image'):   #  CHECK FILE EXISTS
+            profile.profile_image = request.FILES['profile_image']
+            profile.save()
+            messages.success(request, "Profile image updated successfully!")
+        else:
+            messages.warning(request, "Please select an image before updating.")
+
+        return redirect('profile')
+
+    return render(request, 'webapp/profile.html', {'profile': profile})

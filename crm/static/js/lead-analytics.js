@@ -17,11 +17,13 @@ new Chart(document.getElementById('statusChart'), {
         datasets: [{
             data: leadStatusData,
             backgroundColor: [
-                '#0d6efd', // New
-                '#ffc107', // Contacted
-                '#0dcaf0', // Qualified
-                '#198754', // Converted
-                '#dc3545'  // Lost
+               
+                 '#0d6efd', // New
+                 '#ffc107', // Contacted
+                 '#0dcaf0', // Qualified
+                 '#198754', // Converted
+                 '#dc3545'  // Lost
+               
             ]
         }]
     }
@@ -36,11 +38,13 @@ new Chart(document.getElementById('barChart'), {
             label: 'Lead Count',
             data: leadStatusData,
             backgroundColor: [
-                '#0d6efd', // New
-                '#ffc107', // Contacted
-                '#0dcaf0', // Qualified
-                '#198754', // Converted
-                '#dc3545'  // Lost
+                 '#0d6efd', // Contacted
+                 '#ffc107', // 
+                 '#0dcaf0', // Qualified
+                 '#198754', // Converted
+                 '#dc3545'  // Lost
+                
+
             ]
         }]
     }

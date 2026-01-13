@@ -1,6 +1,7 @@
 
 from . import views
-
+from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import path,include
 
 urlpatterns = [
@@ -30,6 +31,13 @@ urlpatterns = [
     path('leads/pipeline/', views.lead_pipeline, name='lead-pipeline'),
     path('leads/analytics/', views.lead_status_analytics, name='lead-analytics'),
 
-    path('manage-roles/', views.manage_user_roles, name='manage-roles')
+    path('manage-roles/', views.manage_user_roles, name='manage-roles'),
+
+    path('profile/', views.profile_view, name='profile')
 
 ]
+
+
+
+
+
