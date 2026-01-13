@@ -8,6 +8,8 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 from .decorators import role_required
 from django.db.models import Count
 
@@ -539,6 +541,8 @@ def manage_user_roles(request):
 def profile_view(request):
     profile = request.user.profile
 
+    password_form = PasswordChangeForm(user=request.user)
+
     # if request.method == 'POST':
     #     profile.profile_image = request.FILES.get('profile_image')
     #     profile.save()
@@ -546,6 +550,7 @@ def profile_view(request):
     #     return redirect('profile')
 
     if request.method == "POST":
+        # Update profile photo
         if request.FILES.get('profile_image'):   #  CHECK FILE EXISTS
             profile.profile_image = request.FILES['profile_image']
             profile.save()
@@ -553,6 +558,23 @@ def profile_view(request):
         else:
             messages.warning(request, "Please select an image before updating.")
 
-        return redirect('profile')
+         # Change password
+        if 'old_password' in request.POST:
+            password_form = PasswordChangeForm(request.user, request.POST)
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)  # keep user logged in
+                messages.success(request, "Password changed successfully")
+                return redirect('profile')
+            else:
+                messages.error(request, "Please correct the password errors")    
 
-    return render(request, 'webapp/profile.html', {'profile': profile})
+        return redirect('profile')
+    
+    context = {
+            'profile: profile,'
+            'password_form': password_form
+        }
+
+    # return render(request, 'webapp/profile.html', {'profile': profile})
+    return render(request, 'webapp/profile.html', context)

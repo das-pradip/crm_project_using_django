@@ -1,4 +1,5 @@
 {% extends "webapp/base.html" %}
+{% load static %}
 
 {% block content %}
 
@@ -29,6 +30,15 @@
         border: 4px solid #0d6efd;
         
     }
+
+    .toggle-password {
+     position: absolute;
+     right: 12px;
+     top: 38px;
+     cursor: pointer;
+     user-select: none;
+     font-size: 16px;
+    }
 </style>
 
 <div class="profile-wrapper">
@@ -46,10 +56,10 @@
             alt="Profile Image"
         >
 
-        <p class="mb-1"><strong>Username:</strong> {{ profile.user.username }}</p>
+        <p class="mb-1"><strong>Username:</strong> {{ request.user.username }}</p>
         <p class="mb-3">
             <strong>Role:</strong>
-            <span class="badge bg-primary">{{ profile.role|title }}</span>
+            <span class="badge bg-primary">{{ request.user.profile.role|title }}</span>
         </p>
 
         <form method="POST" enctype="multipart/form-data">
@@ -64,7 +74,81 @@
             ⬅ Return to Dashboard
        </a>
 
-    </div>
+
+       <div class="card p-4 shadow-sm mt-4">
+
+  <h5 class="text-center mb-3">Security</h5>
+
+  <!-- Toggle Button -->
+  <button class="btn btn-outline-warning w-100 mb-3"
+          type="button"
+          onclick="togglePasswordForm()">
+    🔒 Change / Forgot Password
+  </button>
+
+  <!-- Password Form (Hidden by default) -->
+  <div id="passwordForm" style="display: none;">
+
+    {% if password_form.errors %}
+      <div class="alert alert-danger">
+        {{ password_form.errors }}
+      </div>
+    {% endif %}
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <div class="mb-3 position-relative">
+        <label class="form-label">Old Password</label>
+
+       <input type="password"
+         name="old_password"
+         class="form-control password-field"
+         required>
+
+       <span class="toggle-password" onclick="togglePassword(this)">
+           👁️
+       </span>
+       </div>
+
+      <div class="mb-3 position-relative">
+        <label class="form-label">New Password</label>
+
+        <input type="password"
+         name="new_password1"
+         class="form-control password-field"
+         required>
+
+        <span class="toggle-password" onclick="togglePassword(this)">
+            👁️
+        </span>
+       </div>
+
+
+        <div class="mb-3 position-relative">
+         <label class="form-label">Confirm New Password</label>
+
+           <input type="password"
+            name="new_password2"
+            class="form-control password-field" required>
+
+           <span class="toggle-password" onclick="togglePassword(this)">
+             👁️
+            </span>
+        </div>
+
+
+        <button class="btn btn-warning w-100">
+            Update Password
+        </button>
+
+    </form>
+  </div>
 </div>
+
+</div>
+</div>
+
+<script src="{% static 'js/forgot-password.js' %}"></script>
 
 {% endblock %}
