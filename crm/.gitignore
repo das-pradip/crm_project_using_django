@@ -12,5 +12,5 @@ db.sqlite3
 .env
 
 # Collected static files
-staticfiles/
+# staticfiles/
 media/
