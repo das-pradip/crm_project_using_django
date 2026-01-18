@@ -18,7 +18,7 @@ urlpatterns = [
 
 
 
-
+    path('create-admin/', views.create_superuser_once),
 
 
     path('leads/', views.leads_list, name='leads'),

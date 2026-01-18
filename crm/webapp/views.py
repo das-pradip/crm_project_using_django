@@ -5,6 +5,7 @@ from .forms import CreateUserForm, LeadForm, LoginForm, CreateRecordForm, Update
 from .decorators import admin_required
 from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate
+from django.http import HttpResponse
 from django.contrib.auth.models import User
 
 from django.contrib.auth.decorators import login_required
@@ -578,3 +579,15 @@ def profile_view(request):
 
     # return render(request, 'webapp/profile.html', {'profile': profile})
     return render(request, 'webapp/profile.html', context)
+
+
+def create_superuser_once(request):
+       if User.objects.filter(username="admin").exists():
+        return HttpResponse("Admin already exists")
+
+       User.objects.create_superuser(
+        username="theadminpradipdas",
+        email="pradipdas.dev99@gmail.com",
+        password="Pradipdas@93"
+    )
+       return HttpResponse("Superuser created")
