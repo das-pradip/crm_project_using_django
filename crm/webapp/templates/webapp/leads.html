@@ -99,7 +99,7 @@
 
             
 
-             {% elif request.user.profile.role in 'admin manager' and lead.status == 'qualified' %}
+            {% elif lead.status == 'qualified' %}
               <a href="{% url 'convert-lead' lead.id %}"  class="btn btn-success btn-sm w-100 mt-2">
               Convert to Customer
               
