@@ -13,6 +13,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from .decorators import role_required
 from django.db.models import Count
+from .models import UserProfile
 
 from .models import Lead, Record
 
@@ -470,11 +471,6 @@ def lead_status_analytics(request):
 
 #     return render(request, 'webapp/manage-roles.html', context)
 
-from django.contrib.auth.models import User
-from django.contrib import messages
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from .decorators import admin_required
 
 @login_required(login_url='my-login')
 @admin_required
@@ -573,7 +569,7 @@ def profile_view(request):
         return redirect('profile')
     
     context = {
-            'profile: profile,'
+            'profile': profile,
             'password_form': password_form
         }
 
@@ -581,13 +577,47 @@ def profile_view(request):
     return render(request, 'webapp/profile.html', context)
 
 
-def create_superuser_once(request):
-       if User.objects.filter(username="admin").exists():
-        return HttpResponse("Admin already exists")
+# def create_superuser_once(request):
+#        if User.objects.filter(username="admin").exists():
+#         return HttpResponse("Admin already exists")
 
-       User.objects.create_superuser(
-        username="theadminpradipdas",
-        email="pradipdas.dev99@gmail.com",
-        password="Pradipdas@93"
+#        User.objects.create_superuser(
+#         username="theadminpradipdas",
+#         email="pradipdas.dev99@gmail.com",
+#         password="Pradipdas@93"
+#     )
+       
+#        return HttpResponse("Superuser created")
+
+
+
+def create_superuser_once(request):
+
+    username = "theadminpradipdas"
+    email = "pradipdas.dev99@gmail.com"
+    password = "Pradipdas@93"
+
+    user, created = User.objects.get_or_create(
+        username=username,
+        defaults={
+            "email": email,
+            "is_staff": True,
+            "is_superuser": True,
+        }
     )
-       return HttpResponse("Superuser created")
+
+    if created:
+        user.set_password(password)
+        user.save()
+
+    #  Ensure profile exists with admin role
+    profile, profile_created = UserProfile.objects.get_or_create(
+        user=user,
+        defaults={"role": "admin"}
+    )
+
+    if not profile_created:
+        profile.role = "admin"
+        profile.save()
+
+    return HttpResponse("Admin ensured with admin role")

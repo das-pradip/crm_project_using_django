@@ -34,6 +34,7 @@
                 {% else %}
                 <form method="POST" class="d-flex gap-2 justify-content-center">
                     {% csrf_token %}
+                    <input type="hidden" name="action" value="update">
                     <input type="hidden" name="user_id" value="{{ user.id }}">
 
                     <select name="role" class="form-select form-select-sm w-50">
